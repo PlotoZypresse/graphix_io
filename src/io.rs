@@ -1,5 +1,7 @@
 use graphix::GraphRep;
 use std::collections::HashSet;
+use std::fmt::Display;
+use std::hash::Hash;
 use std::io::BufWriter;
 use std::io::Write;
 use std::str::FromStr;
@@ -72,7 +74,7 @@ where
 
 pub fn write<K>(graph: &GraphRep<K>, file_path: &str) -> io::Result<()>
 where
-    K: std::fmt::Display + Copy + std::cmp::PartialEq + PartialOrd + std::cmp::Eq + std::hash::Hash,
+    K: Display + Copy + PartialEq + Eq + PartialOrd + Hash,
 {
     let file = File::create(file_path)?;
     let mut content = BufWriter::new(file);
