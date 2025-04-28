@@ -1,7 +1,6 @@
 # graphix_io
 
-[![Crates.io](https://img.shields.io/crates/v/graphix_io.svg)](https://crates.io/crates/graphix_io)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/graphix_io.svg)](https://crates.io/crates/graphix_io)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A lightweight Rust library for reading and writing graphs from and to text files, based on the [`graphix`](https://crates.io/crates/graphix) graph representation.
 It provides a simple and efficient way to load and save graphs for use in graph algorithms or visualization tools.
@@ -12,9 +11,10 @@ It provides a simple and efficient way to load and save graphs for use in graph 
 
 - **Read** graphs from text files:
   - File format: `start_vertex end_vertex weight`
-  - Each line represents one edge.
+  - Each line represents one edge (invalid or malformed lines are skipped).
 - **Write** graphs to text files:
-  - Automatically ensures undirected edges are written only once.
+  - Automatically ensures undirected edges are written only once
+  - Uses a simple in-memory Vec-based scan; no `Hash` or `Eq` bounds required on the weight type
 - **Designed to work with** [`graphix::GraphRep<K>`](https://crates.io/crates/graphix).
 - **Minimal dependencies**, fast and lightweight.
 
@@ -66,12 +66,16 @@ Each line defines an undirected edge with a weight.
 ### `read<K>(file_path: &str) -> io::Result<GraphRep<K>>`
 
 Reads a graph from a text file into a `GraphRep<K>`.
-- Requires `K: FromStr + Copy + PartialOrd`.
+
+- **Trait bounds:** `K: FromStr + Copy + PartialOrd`
+- Skips lines that do not have exactly three whitespace-separated tokens.
 
 ### `write<K>(graph: &GraphRep<K>, file_path: &str) -> io::Result<()>`
 
-Writes a graph to a text file.
-- Requires `K: Display + Copy + PartialOrd + Eq + Hash`.
+Writes a graph to a text file, emitting each undirected edge exactly once.
+
+- **Trait bounds:** `K: Display + Copy + PartialEq + PartialOrd`
+- Does not require `Hash` or `Eq` on `K`; uses a linear scan of a `Vec` to track seen edges.
 
 ## License
 
