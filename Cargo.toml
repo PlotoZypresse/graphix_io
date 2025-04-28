@@ -1,0 +1,17 @@
+[package]
+name = "graphix_io"
+version = "0.1.0"
+edition = "2021"
+authors = ["PlotoZypresse"]
+description = "A Rust library for reading and writing graphs from and to text files, based on the graphix crate."
+repository = "https://github.com/PlotoZypresse/graphix_io"
+homepage = "https://github.com/PlotoZypresse/graphix_io"
+license = "MIT"
+keywords = ["graph", "file-io", "file-format", "graphix", "rust"]
+categories = ["data-structures"]
+readme = "README.md"
+
+exclude = ["test_files/*", "src/main.rs"]
+
+[dependencies]
+graphix = "0.2.1"
