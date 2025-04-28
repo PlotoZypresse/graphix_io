@@ -1,13 +1,10 @@
-use std::collections::HashSet;
 use std::fmt::Display;
-use std::hash::Hash;
+use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;
+use std::io::{self};
+use std::io::{BufRead, BufReader};
 use std::str::FromStr;
-use std::{
-    fs::File,
-    io::{self, BufRead, BufReader},
-};
 
 use graphix::GraphRep;
 
@@ -73,22 +70,26 @@ where
     Ok(graph)
 }
 
-pub fn write<K>(graph: &GraphRep<K>, file_path: &str) -> std::io::Result<()>
+pub fn write<K>(graph: &GraphRep<K>, file_path: &str) -> io::Result<()>
 where
-    K: Display + Copy + PartialEq + PartialOrd + Hash + std::cmp::Eq, // Use PartialEq instead of Eq for K
+    K: Display + Copy + PartialEq + PartialOrd,
 {
     let file = File::create(file_path)?;
     let mut content = BufWriter::new(file);
 
-    let mut seen_edges = HashSet::new();
+    // we no longer need Hash+Eq on K – just keep a Vec and do a linear scan
+    let mut seen_edges: Vec<(usize, usize, K)> = Vec::new();
 
     for u in 0..graph.num_vertices() {
         for (v, weight) in graph.edges_from(u) {
-            if seen_edges.contains(&(v, u, weight)) || seen_edges.contains(&(u, v, weight)) {
+            // skip if we've already seen this edge in either direction
+            if seen_edges.iter().any(|&(x, y, w)| {
+                (x == u && y == v && w == weight) || (x == v && y == u && w == weight)
+            }) {
                 continue;
             }
             writeln!(content, "{} {} {}", u, v, weight)?;
-            seen_edges.insert((u, v, weight));
+            seen_edges.push((u, v, weight));
         }
     }
     Ok(())
