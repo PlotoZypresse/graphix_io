@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use std::fmt::Display;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 use std::io::BufWriter;
 use std::io::Write;
 use std::str::FromStr;
