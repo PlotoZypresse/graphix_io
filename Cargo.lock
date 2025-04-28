@@ -10,7 +10,7 @@ checksum = "6a6d150153921ed6de686ebac91c9292b05f6c2502a77d74e2f101db513e0f0a"
 
 [[package]]
 name = "graphix_io"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "graphix",
 ]
