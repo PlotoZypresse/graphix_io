@@ -1,7 +1,6 @@
-use graphix::GraphRep;
 use std::collections::HashSet;
 use std::fmt::Display;
-use std::hash::Hash;
+use std::hash::{Hash, Hasher};
 use std::io::BufWriter;
 use std::io::Write;
 use std::str::FromStr;
@@ -9,6 +8,8 @@ use std::{
     fs::File,
     io::{self, BufRead, BufReader},
 };
+
+use graphix::GraphRep;
 
 // reads a graph from a file
 // and puts it into a graphix graph representation
@@ -72,9 +73,9 @@ where
     Ok(graph)
 }
 
-pub fn write<K>(graph: &GraphRep<K>, file_path: &str) -> io::Result<()>
+pub fn write<K>(graph: &GraphRep<K>, file_path: &str) -> std::io::Result<()>
 where
-    K: Display + Copy + PartialEq + Eq + PartialOrd + Hash,
+    K: Display + Copy + PartialEq + PartialOrd + Hash + std::cmp::Eq, // Use PartialEq instead of Eq for K
 {
     let file = File::create(file_path)?;
     let mut content = BufWriter::new(file);
