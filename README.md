@@ -2,80 +2,104 @@
 
 [![Crates.io](https://img.shields.io/crates/v/graphix_io.svg)](https://crates.io/crates/graphix_io)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A lightweight Rust library for reading and writing graphs from and to text files, based on the [`graphix`](https://crates.io/crates/graphix) graph representation.
-It provides a simple and efficient way to load and save graphs for use in graph algorithms or visualization tools.
+A minimal Rust I/O helper for loading and saving undirected graphs in plain-text edge-list format, built on top of [`graphix`](https://crates.io/crates/graphix).
 
 ---
 
 ## Features
 
-- **Read** graphs from text files:
-  - File format: `start_vertex end_vertex weight`
-  - Each line represents one edge (invalid or malformed lines are skipped).
-- **Write** graphs to text files:
-  - Automatically ensures undirected edges are written only once
-  - Uses a simple in-memory Vec-based scan; no `Hash` or `Eq` bounds required on the weight type
-- **Designed to work with** [`graphix::GraphRep<K>`](https://crates.io/crates/graphix).
-- **Minimal dependencies**, fast and lightweight.
+- **Read**
+  - `read<K>(path: &str) -> io::Result<GraphRep<K>>`
+  - Parses every valid line of `u v w` into `Vec<(usize,usize,K)>`, then calls `GraphRep::from_list`.
+  - **Trait bounds:** `K: FromStr + Copy`
+  - Skips blank or malformed lines silently.
+
+- **Write**
+  - `write<K>(graph: &GraphRep<K>, path: &str) -> io::Result<()>`
+  - Emits each original undirected edge exactly once by iterating `graph.id`.
+  - **Trait bounds:** `K: Display + Copy`
+
+- Zero panics on empty files.
+- No hash tables or manual “seen” tracking—just buffered I/O and CSR’s `id` array.
+
+---
 
 ## Installation
 
-Add `graphix_io` to your `Cargo.toml` dependencies:
-
 ```toml
 [dependencies]
-graphix_io = "0.1"
-graphix = "0.2"
-```
+graphix_io = "0.3"
+graphix    = "0.4"
+````
 
-Or with `cargo`:
+Or via Cargo:
 
 ```bash
-cargo add graphix_io
+cargo add graphix_io@0.3 graphix@0.4
 ```
 
-## Quick Start
+---
+
+## Usage
+
+### Input format
+
+Plain-text file where each line is:
+
+```
+<u> <v> <w>
+```
+
+* `<u>`, `<v>` are `usize` vertex IDs
+* `<w>` is your weight type `K::from_str` parses
+
+Blank or malformed lines are skipped.
+
+### Example
 
 ```rust
+use graphix::GraphRep;
 use graphix_io::io::{read, write};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Read a graph from a file
-    let graph = read::<i32>("test_graph.txt")?;
+    // 1) Read into CSR graph
+    let graph: GraphRep<f64> = read("input.txt")?;
+    println!("Loaded {} vertices, {} edges",
+             graph.num_vertices(),
+             graph.num_edges());
 
-    // Write the graph to another file
-    write(&graph, "output_graph.txt")?;
+    // … run algorithms …
 
+    // 2) Write back original edge list
+    write(&graph, "output.txt")?;
     Ok(())
 }
 ```
 
-Where `test_graph.txt` contains lines like:
+Run with:
 
-```
-0 1 10
-1 2 20
-2 3 30
-3 0 40
+```bash
+cargo run
 ```
 
-Each line defines an undirected edge with a weight.
+---
 
 ## API
 
-### `read<K>(file_path: &str) -> io::Result<GraphRep<K>>`
+```rust
+pub fn read<K>(file_path: &str) -> io::Result<GraphRep<K>>
+where
+    K: FromStr + Copy,
+    K::Err: Debug;
+```
 
-Reads a graph from a text file into a `GraphRep<K>`.
+```rust
+pub fn write<K>(graph: &GraphRep<K>, file_path: &str) -> io::Result<()>
+where
+    K: Display + Copy;
+```
 
-- **Trait bounds:** `K: FromStr + Copy + PartialOrd`
-- Skips lines that do not have exactly three whitespace-separated tokens.
-
-### `write<K>(graph: &GraphRep<K>, file_path: &str) -> io::Result<()>`
-
-Writes a graph to a text file, emitting each undirected edge exactly once.
-
-- **Trait bounds:** `K: Display + Copy + PartialEq + PartialOrd`
-- Does not require `Hash` or `Eq` on `K`; uses a linear scan of a `Vec` to track seen edges.
+---
 
 ## License
 
