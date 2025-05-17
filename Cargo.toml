@@ -1,6 +1,6 @@
 [package]
 name = "graphix_io"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2021"
 authors = ["PlotoZypresse"]
 description = "A Rust library for reading and writing graphs from and to text files, based on the graphix crate."
@@ -14,4 +14,4 @@ readme = "README.md"
 exclude = ["test_files/*", "src/main.rs"]
 
 [dependencies]
-graphix = "0.4.0"
+graphix = "0.5.1"

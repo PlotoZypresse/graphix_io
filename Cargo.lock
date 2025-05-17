@@ -4,13 +4,13 @@ version = 4
 
 [[package]]
 name = "graphix"
-version = "0.4.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "854ae120ae377565ed689ab6ece2b4fbbb6cc25bc3d7bddc8a64c57cf76945a9"
+checksum = "b9e3fa80ae491343aefbff6ebc7f4e258e843f3159035586d4c4c6f2c48b859b"
 
 [[package]]
 name = "graphix_io"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "graphix",
 ]
