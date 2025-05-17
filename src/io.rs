@@ -30,8 +30,8 @@ where
         if parts.len() != 3 {
             continue;
         }
-        let u: usize = parts[0].parse().expect("invalid vertex");
-        let v: usize = parts[1].parse().expect("invalid vertex");
+        let u: usize = parts[0].parse::<usize>().unwrap() - 1;
+        let v: usize = parts[1].parse::<usize>().unwrap() - 1;
         let w: K = parts[2].parse().expect("invalid weight");
         edges.push((u, v, w));
     }
